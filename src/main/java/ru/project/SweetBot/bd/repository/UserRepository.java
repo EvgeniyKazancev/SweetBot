@@ -8,5 +8,5 @@ import ru.project.SweetBot.bd.entity.Users;
 @Repository
 public interface UserRepository extends JpaRepository<Users, Long> {
 
-
+    //Users findByUsername(String username);
 }

@@ -1,6 +1,5 @@
 package ru.project.SweetBot.bot;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -10,7 +9,6 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.project.SweetBot.bd.services.UsersManagementService;
 import ru.project.SweetBot.config.BotConfig;
 import ru.project.SweetBot.services.MessageProcessing;
-
 
 @Component
 public class TelegramSweetBot extends TelegramLongPollingBot {
@@ -50,57 +48,18 @@ public class TelegramSweetBot extends TelegramLongPollingBot {
                     if (previousOperation.equals("play") && messageProcessing.isWaitingForNumber(chatId)) {
                         messageProcessing.welcomeMessage(chatId, this);
                         previousOperation = "welcome";
-                        System.out.println("***************************************");
+
                         messageProcessing.handleUserDataInput(chatId, messageText, update.getMessage().getChat().getUserName());
 
-//                        if (messageText.matches("\\d+") ) {
-//                            int number = Integer.parseInt(messageText);
-//                            System.out.println("!!!!!!!!!!!!");
-//                            messageProcessing.processUserNumberInput(chatId, number, this);
-//
-//                            messageProcessing.handNumberInput(chatId, number, this);
-//
-//                        } else {
-//                            System.out.println(previousOperation);
-//
-//                            messageProcessing.handleUserDataInput(chatId, messageText, update.getMessage().getChat().getUserName());
-//
-//                        }
-
                     } else if (messageText.matches("\\d+") && previousOperation.equals("welcome")) {
-                        int number = Integer.parseInt(messageText);
-                        System.out.println("!!!!!!!!!!!!");
-                        messageProcessing.processUserNumberInput(chatId, number, this);
+                        int number = Integer.parseInt(messageText);                            // убрать тгьиук перенести в метод 
 
+                        messageProcessing.processUserNumberInput(chatId, number, this);
                         messageProcessing.handNumberInput(chatId, number, this);
-                       // messageProcessing.handleUserInput(update, messageText, this);
                         messageProcessing.endMessage(chatId, this);
-                      //  messageProcessing.handleUserInput(update, messageText, this);
-//                    } else {
-//                        System.out.println(previousOperation);
-//
-////                        messageProcessing.handleUserDataInput(chatId, messageText, update.getMessage().getChat().getUserName());
-//
-//
-//
-//                        messageProcessing.endMessage(chatId, this);
-//                        //messageProcessing.setWaitingForNumber(chatId, false);
-//                        messageProcessing.handleUserInput(update, messageText, this);
+
                     }
                     break;
-//                    if (messageProcessing.isWaitingForNumber(chatId)) {
-//                        int number = Integer.parseInt(messageText);
-//                        messageProcessing.handleUserDataInput(chatId, messageText);
-//                        messageProcessing.setWaitingForNumber(chatId, false);
-//                        messageProcessing.welcomeMessage(chatId, this);
-//                        messageProcessing.setWaitingForNumber(chatId, true);
-//                        messageProcessing.handNumberInput(chatId,number,this);
-//                        messageProcessing.setWaitingForNumber(chatId,false);
-//
-//                    } else {
-//                        messageProcessing.handleUserInput(update, messageText, this);
-//
-
             }
         }
     }

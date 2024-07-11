@@ -11,19 +11,25 @@ import java.util.List;
 
 @Service
 public class UsersManagementService {
-    @Autowired
+
+
     private final UserRepository userRepository;
-
-
+    @Autowired
     public UsersManagementService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
-  public void save(Users users) {
-        userRepository.save(users);
-  }
-  public List<Users> findAll() {
-        return userRepository.findAll();
-  }
 
+    public void save(Users users) {
+        userRepository.save(users);
+    }
+
+    public List<Users> findAll() {
+        return userRepository.findAll();
+    }
+
+//    public Users getUser(String username) {
+//        Users users = userRepository.findByUsername(username);
+//        return users;
+//    }
 
 }
