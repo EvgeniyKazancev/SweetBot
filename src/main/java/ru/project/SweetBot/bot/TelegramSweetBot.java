@@ -6,9 +6,12 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import ru.project.SweetBot.bd.entity.Users;
 import ru.project.SweetBot.bd.services.UsersManagementService;
 import ru.project.SweetBot.config.BotConfig;
 import ru.project.SweetBot.services.MessageProcessing;
+
+import java.sql.SQLException;
 
 @Component
 public class TelegramSweetBot extends TelegramLongPollingBot {
@@ -49,13 +52,21 @@ public class TelegramSweetBot extends TelegramLongPollingBot {
                         messageProcessing.welcomeMessage(chatId, this);
                         previousOperation = "welcome";
 
-                        messageProcessing.handleUserDataInput(chatId, messageText, update.getMessage().getChat().getUserName());
+                        try {
+                            messageProcessing.handleUserDataInput(chatId, messageText, update.getMessage().getChat().getUserName());
+                        } catch (SQLException e) {
+                            throw new RuntimeException(e);
+                        }
 
                     } else if (messageText.matches("\\d+") && previousOperation.equals("welcome")) {
-                        int number = Integer.parseInt(messageText);                            // убрать тгьиук перенести в метод 
-
+                        int number = Integer.parseInt(messageText);
+                        Users user = usersServices.getUser(update.getMessage().getChat().getId());
                         messageProcessing.processUserNumberInput(chatId, number, this);
-                        messageProcessing.handNumberInput(chatId, number, this);
+                        try {
+                            messageProcessing.handNumberInput(chatId, number, this,user);
+                        } catch (SQLException e) {
+                            throw new RuntimeException(e);
+                        }
                         messageProcessing.endMessage(chatId, this);
 
                     }

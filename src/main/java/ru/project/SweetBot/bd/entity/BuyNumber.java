@@ -22,11 +22,9 @@ public class BuyNumber {
     private LocalDateTime dateTime;
 
     @ManyToOne
-    @JoinColumn(name = "users_id")
+    @JoinColumn(name = "users_id",referencedColumnName = "id")
     private Users user;
 
     public BuyNumber() {
     }
-
-
 }

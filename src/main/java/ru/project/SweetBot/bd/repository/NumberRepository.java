@@ -8,11 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-public interface NumberRepository extends JpaRepository<BuyNumber, Integer> {
+public interface NumberRepository extends JpaRepository<BuyNumber, Long> {
 
-    List<Integer> findByNumber = new ArrayList<>();
 
-    BuyNumber findByUserId(Long userId);
+
 
 
 }

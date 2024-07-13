@@ -18,16 +18,19 @@ public class NumberServices {
     }
 
 
-    public BuyNumber getNumber(Long userId) {
-       return numberRepository.findByUserId(userId);
-    }
+//    public int getNumber(Long userId) {
+//
+//        return numberRepository.findByUserId(userId);
+//    }
+
     public void save(BuyNumber bayNumber) {
-       numberRepository.save(bayNumber);
+        numberRepository.save(bayNumber);
     }
 
 
-      public List<BuyNumber> getNumbers() {
+    public List<BuyNumber> getNumbers() {
 
         return numberRepository.findAll();
-      }
+    }
+
 }

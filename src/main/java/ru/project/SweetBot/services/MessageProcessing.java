@@ -13,6 +13,7 @@ import ru.project.SweetBot.bd.services.NumberServices;
 import ru.project.SweetBot.bd.services.UsersManagementService;
 import ru.project.SweetBot.bot.TelegramSweetBot;
 
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,9 +31,6 @@ public class MessageProcessing extends InputDate {
     private final CheckServices checkServices;
     private final Randomizer randomizer;
 
-//
-//     String sweets = "Торт \"Наполеон\"";
-//    int maxNumber = 20;
 
     @Autowired
     public MessageProcessing(Map<Long, Boolean> waitingForNumberMap, UsersManagementService usersManagementService, NumberServices numberServices, CheckServices checkServices, Randomizer randomizer) {
@@ -70,10 +68,11 @@ public class MessageProcessing extends InputDate {
         bot.sendMessage(chatId, endMessage);
         numberList = numberServices.getNumbers();
         if (numberList.size() == 20) {
-           int result = randomizer.startRandom(maxNumber);
-            String response = " Выпало число : " + result;
-            bot.sendMessage(chatId, response);
-        }else {
+            result = randomizer.startRandom(maxNumber);
+            winsMessage(chatId, bot);
+//            String response = " Выпало число : " + result;
+//            bot.sendMessage(chatId, response);
+        } else {
             String wait = "Пока куплено " + numberList.size() + " номерков! Ждите)!";
             bot.sendMessage(chatId, wait);
         }
@@ -95,29 +94,29 @@ public class MessageProcessing extends InputDate {
         waitingForNumberMap.put(chatId, true);
     }
 
-    public void handleUserInput(Update update, String messageText, Users user, TelegramSweetBot bot) {
-        if (isWaitingForNumber(update.getMessage().getChatId())) {
-            if (messageText.matches("\\d+")) {
-                int number = Integer.parseInt(messageText);
+//    public void handleUserInput(Update update, String messageText, Users user, TelegramSweetBot bot) {
+//        if (isWaitingForNumber(update.getMessage().getChatId())) {
+//            if (messageText.matches("\\d+")) {
+//                int number = Integer.parseInt(messageText);
+//
+//                if (number >= 1 && number <= maxNumber) {
+//                    handNumberInput(update.getMessage().getChatId(), number, bot);
+//                    processUserNumberInput(update.getMessage().getChatId(), number, bot);
+//                    endMessage(update.getMessage().getChatId(), bot);
+//                } else {
+//                    bot.sendMessage(update.getMessage().getChatId(), "Пожалуйста, введите число от 1 до " + maxNumber + ".");
+//
+//                }
+//            } else {
+//                bot.sendMessage(update.getMessage().getChatId(), "Пожалуйста, введите корректное число.");
+//
+//            }
+//
+//        }
+//
+//    }
 
-                if (number >= 1 && number <= maxNumber) {
-                    handNumberInput(update.getMessage().getChatId(), number, bot);
-                    processUserNumberInput(update.getMessage().getChatId(), number, bot);
-                    endMessage(update.getMessage().getChatId(), bot);
-                } else {
-                    bot.sendMessage(update.getMessage().getChatId(), "Пожалуйста, введите число от 1 до " + maxNumber + ".");
-
-                }
-            } else {
-                bot.sendMessage(update.getMessage().getChatId(), "Пожалуйста, введите корректное число.");
-
-            }
-
-        }
-
-    }
-
-    public void handleUserDataInput(Long chatId, String userData, String telegramName) {
+    public void handleUserDataInput(Long chatId, String userData, String telegramName) throws SQLException {
         String[] userDataArray = userData.split(",");
         if (userDataArray.length == 4) {
             String firstName = userDataArray[0].trim();
@@ -132,24 +131,28 @@ public class MessageProcessing extends InputDate {
             user.setPhoneNumber(phoneNumber);
             user.setEmail(email);
             user.setTelegramId(telegramName);
-            try {
-                usersManagementService.save(user);
-            } catch (Exception e) {
-                e.getMessage();
-            }
+
+            usersManagementService.save(user);
+
+            usersManagementService.save(user);
+            System.out.println("юзер сохранен!!!!!!!!" + user.getId());
+
         } else {
 
         }
     }
 
-    public void handNumberInput(Long chatId, int number, TelegramSweetBot bot) {
+    public void handNumberInput(Long chatId, int number, TelegramSweetBot bot, Users user) throws  SQLException{
         BuyNumber bayNumber = new BuyNumber();
         if (number >= 1 && number <= maxNumber) {
             bayNumber.setNumber(number);
 
             bayNumber.setDateTime(LocalDateTime.now());
-            //  bayNumber.setUser(users);
-            numberServices.save(bayNumber);
+
+            bayNumber.setUser(user);
+
+                numberServices.save(bayNumber);
+
         } else {
             bot.sendMessage(chatId, "Введите значение не больше " + maxNumber + "\n" +
                     "Но возможно такое числу уже занято, выберете другое)). ");
@@ -157,12 +160,17 @@ public class MessageProcessing extends InputDate {
         }
 
     }
-//    public String getWinning(TelegramSweetBot bot){
+
+    //    public String getWinning(TelegramSweetBot bot){
 //         boolean result;
 //         List<Integer> lengthNumbers = numberServices.getNumbers();
 //        if (lengthNumbers.le )
 //            return
 //    }
+    public void winsMessage(Long chatId, TelegramSweetBot bot) {
+        String winsMess = "ПОЗДРАВЛЯЕМ!!!! Победителем стал номер : " + result + "В ближайшее время с вами свяжутся и расскажут как забрать ваш выигрыш!!! ";
+        bot.sendMessage(chatId, winsMess);
+    }
 
     public void setWaitingForNumber(Long chatId, boolean value) {
         waitingForNumberMap.put(chatId, value);
