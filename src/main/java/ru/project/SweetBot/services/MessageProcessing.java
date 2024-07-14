@@ -1,6 +1,9 @@
 package ru.project.SweetBot.services;
 
 
+import org.apache.commons.io.FileUtils;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +16,9 @@ import ru.project.SweetBot.bd.services.NumberServices;
 import ru.project.SweetBot.bd.services.UsersManagementService;
 import ru.project.SweetBot.bot.TelegramSweetBot;
 
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -64,7 +70,9 @@ public class MessageProcessing extends InputDate {
         String endMessage = "Супер))! \n" +
                 "Как только будут куплены все номера розыгрышь пройдет автоматически \n" +
                 "и вам будет сообщен результат! Желаем удачи! \n" +
-                "Разыгрываем вкуснейший " + sweets;
+                "Разыгрываем вкуснейший " + sweets + "\n" +
+                "Пожалуйста отправте  квитанцию, что бы мы могли отследить платеж) \n" +
+                "Выберете в меню /docks";
         bot.sendMessage(chatId, endMessage);
         numberList = numberServices.getNumbers();
         if (numberList.size() == 20) {
@@ -135,14 +143,14 @@ public class MessageProcessing extends InputDate {
             usersManagementService.save(user);
 
             usersManagementService.save(user);
-            System.out.println("юзер сохранен!!!!!!!!" + user.getId());
+
 
         } else {
 
         }
     }
 
-    public void handNumberInput(Long chatId, int number, TelegramSweetBot bot, Users user) throws  SQLException{
+    public void handNumberInput(Long chatId, int number, TelegramSweetBot bot, Users user) throws SQLException {
         BuyNumber bayNumber = new BuyNumber();
         if (number >= 1 && number <= maxNumber) {
             bayNumber.setNumber(number);
@@ -151,7 +159,7 @@ public class MessageProcessing extends InputDate {
 
             bayNumber.setUser(user);
 
-                numberServices.save(bayNumber);
+            numberServices.save(bayNumber);
 
         } else {
             bot.sendMessage(chatId, "Введите значение не больше " + maxNumber + "\n" +
@@ -159,6 +167,37 @@ public class MessageProcessing extends InputDate {
 
         }
 
+    }
+    public  void  seyGetDocks(Long chatId, TelegramSweetBot bot) {
+        String getMess = "Прикрепите пожалуйста квитанцию!";
+        bot.sendMessage(chatId, getMess);
+
+    }
+
+    public void getDocks(Long chatId, TelegramSweetBot bot, String fileName, String fileId) throws IOException {
+        System.out.println("*******************************");
+     if (!waitingForNumberMap.getOrDefault(chatId, false)) {
+         URL url = new URL("https://api.telegram.org/bot" + bot.getBotToken() + "/getFile?file_id=" + fileId);
+
+         BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()));
+         String getFileInput = br.readLine();
+
+         JSONObject jsonResult = new JSONObject(getFileInput);
+         JSONObject jsonPath = jsonResult.getJSONObject("result");
+         String filePAth = jsonPath.getString("file_path");
+         System.out.println(filePAth);
+
+         File file = new File("src/main/resources/uploadFile/my_file" + fileName);
+         InputStream inputStream = new URL("https://api.telegram.org/file/bot" + bot.getBotToken() + "/" + filePAth).openStream();
+
+         FileUtils.copyInputStreamToFile(inputStream, file);
+         String outDocksMess = "Спасибо файл успешно отправлен!";
+         bot.sendMessage(chatId, outDocksMess);
+         waitingForNumberMap.put(chatId, false);
+
+         br.close();
+         inputStream.close();
+     }
     }
 
     //    public String getWinning(TelegramSweetBot bot){

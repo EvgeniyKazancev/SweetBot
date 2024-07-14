@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.Document;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.project.SweetBot.bd.entity.Users;
@@ -11,6 +12,7 @@ import ru.project.SweetBot.bd.services.UsersManagementService;
 import ru.project.SweetBot.config.BotConfig;
 import ru.project.SweetBot.services.MessageProcessing;
 
+import java.io.IOException;
 import java.sql.SQLException;
 
 @Component
@@ -31,6 +33,7 @@ public class TelegramSweetBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
+        Document document = update.getMessage().getDocument();
 
         if (update.hasMessage() && update.getMessage().hasText()) {
             String messageText = update.getMessage().getText();
@@ -46,6 +49,20 @@ public class TelegramSweetBot extends TelegramLongPollingBot {
                     previousOperation = "play";
                     messageProcessing.setWaitingForNumber(chatId, true);
                     break;
+                case "/docks":
+
+
+
+
+
+                        try {
+                            messageProcessing.getDocks(chatId, this, document.getFileName(), document.getFileId());
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+
+                    break;
+
                 default:
 
                     if (previousOperation.equals("play") && messageProcessing.isWaitingForNumber(chatId)) {
@@ -63,12 +80,12 @@ public class TelegramSweetBot extends TelegramLongPollingBot {
                         Users user = usersServices.getUser(update.getMessage().getChat().getId());
                         messageProcessing.processUserNumberInput(chatId, number, this);
                         try {
-                            messageProcessing.handNumberInput(chatId, number, this,user);
+                            messageProcessing.handNumberInput(chatId, number, this, user);
                         } catch (SQLException e) {
                             throw new RuntimeException(e);
                         }
                         messageProcessing.endMessage(chatId, this);
-
+                        messageProcessing.seyGetDocks(chatId,this);
                     }
                     break;
             }
