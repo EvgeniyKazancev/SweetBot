@@ -10,30 +10,30 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-@Table(name = "Users")
+@Table(name = "users")
 public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "FirstName")
+    @Column(name = "firstName")
     private String firstName;
 
-    @Column(name = "LastName")
+    @Column(name = "lastName")
     private String lastName;
 
     @Email
-    @Column(name = "Email")
+    @Column(name = "email")
     private String email;
 
-    @Column(name = "PhoneNumber", unique = true)
+    @Column(name = "phoneNumber", unique = true)
     private Long phoneNumber;
 
-    @Column(name = "Telegram", unique = true)
+    @Column(name = "telegram", unique = true)
     private String telegramId;
 
-    @Column(name = "Admin", nullable = false, length = 1)
+    @Column(name = "admin", nullable = false, length = 1)
     private boolean isAdmin;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)

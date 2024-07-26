@@ -2,14 +2,12 @@ package ru.project.SweetBot.services;
 
 
 import org.apache.commons.io.FileUtils;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 
 import org.telegram.telegrambots.meta.api.objects.Update;
-
 import ru.project.SweetBot.bd.entity.BuyNumber;
 import ru.project.SweetBot.bd.entity.Users;
 import ru.project.SweetBot.bd.services.NumberServices;
@@ -17,7 +15,6 @@ import ru.project.SweetBot.bd.services.UsersManagementService;
 import ru.project.SweetBot.bot.TelegramSweetBot;
 
 import java.io.*;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -25,17 +22,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import org.springframework.http.ResponseEntity;
 
 @Component
-public class MessageProcessing extends InputDate {
+public class MessageProcessing extends ru.project.SweetBot.services.InputDate {
 
 
     private final Map<Long, Boolean> waitingForNumberMap;
     private final UsersManagementService usersManagementService;
     private final NumberServices numberServices;
-    private final CheckServices checkServices;
-    private final Randomizer randomizer;
+    private final ru.project.SweetBot.services.CheckServices checkServices;
+    private final ru.project.SweetBot.services.Randomizer randomizer;
 
 
     @Autowired
@@ -142,7 +139,7 @@ public class MessageProcessing extends InputDate {
 
             usersManagementService.save(user);
 
-            usersManagementService.save(user);
+           // usersManagementService.save(user);
 
 
         } else {
@@ -174,31 +171,31 @@ public class MessageProcessing extends InputDate {
 
     }
 
-    public void getDocks(Long chatId, TelegramSweetBot bot, String fileName, String fileId) throws IOException {
-        System.out.println("*******************************");
-     if (!waitingForNumberMap.getOrDefault(chatId, false)) {
-         URL url = new URL("https://api.telegram.org/bot" + bot.getBotToken() + "/getFile?file_id=" + fileId);
-
-         BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()));
-         String getFileInput = br.readLine();
-
-         JSONObject jsonResult = new JSONObject(getFileInput);
-         JSONObject jsonPath = jsonResult.getJSONObject("result");
-         String filePAth = jsonPath.getString("file_path");
-         System.out.println(filePAth);
-
-         File file = new File("src/main/resources/uploadFile/my_file" + fileName);
-         InputStream inputStream = new URL("https://api.telegram.org/file/bot" + bot.getBotToken() + "/" + filePAth).openStream();
-
-         FileUtils.copyInputStreamToFile(inputStream, file);
-         String outDocksMess = "Спасибо файл успешно отправлен!";
-         bot.sendMessage(chatId, outDocksMess);
-         waitingForNumberMap.put(chatId, false);
-
-         br.close();
-         inputStream.close();
-     }
-    }
+//    public void getDocks(Long chatId, TelegramSweetBot bot, String fileName, String fileId) throws IOException {
+//       // System.out.println("*******************************");
+//
+//         URL url = new URL("https://api.telegram.org/bot" + bot.getBotToken() + "/getFile?file_id=" + fileId);
+//
+//         BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()));
+//         String getFileInput = br.readLine();
+//
+//         JSONObject jsonResult = new JSONObject(getFileInput);
+//         JSONObject jsonPath = jsonResult.getJSONObject("result");
+//         String filePAth = jsonPath.getString("file_path");
+//         System.out.println(filePAth);
+//
+//         File file = new File("src/main/resources/uploadFile/my_file" + fileName);
+//         InputStream inputStream = new URL("https://api.telegram.org/file/bot" + bot.getBotToken() + "/" + filePAth).openStream();
+//
+//         FileUtils.copyInputStreamToFile(inputStream, file);
+//         String outDocksMess = "Спасибо файл успешно отправлен!";
+//         bot.sendMessage(chatId, outDocksMess);
+//         waitingForNumberMap.put(chatId, false);
+//
+//         br.close();
+//         inputStream.close();
+//
+//    }
 
     //    public String getWinning(TelegramSweetBot bot){
 //         boolean result;
@@ -210,6 +207,7 @@ public class MessageProcessing extends InputDate {
         String winsMess = "ПОЗДРАВЛЯЕМ!!!! Победителем стал номер : " + result + "В ближайшее время с вами свяжутся и расскажут как забрать ваш выигрыш!!! ";
         bot.sendMessage(chatId, winsMess);
     }
+
 
     public void setWaitingForNumber(Long chatId, boolean value) {
         waitingForNumberMap.put(chatId, value);

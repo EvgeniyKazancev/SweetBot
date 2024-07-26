@@ -15,10 +15,10 @@ public class BuyNumber {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "Number")
+    @Column(name = "number")
     private int number;
 
-    @Column(name = "Date")
+    @Column(name = "date")
     private LocalDateTime dateTime;
 
     @ManyToOne
