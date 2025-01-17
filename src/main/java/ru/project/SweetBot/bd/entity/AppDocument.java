@@ -29,4 +29,7 @@ public class AppDocument {
     private Long fileSize;
 
 
+    public AppDocument() {
+
+    }
 }

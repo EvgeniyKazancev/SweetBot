@@ -45,7 +45,9 @@ public class FileServicesImpl implements FileService {
 
     @Override
     public AppDocument processDocument(Message telegramMessage) {
-        String field = telegramMessage.getDocument().getFileId();
+
+        Document document = telegramMessage.getDocument();
+        String field = document.getFileId();
         ResponseEntity<String> response = getFilePath(field);
         if (response.getStatusCode() == HttpStatus.OK) {
             JSONObject jsonObject = new JSONObject(response.getBody());

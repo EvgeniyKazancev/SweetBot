@@ -155,7 +155,7 @@ public class MessageProcessing extends ru.project.SweetBot.services.InputDate {
             bayNumber.setDateTime(LocalDateTime.now());
 
             bayNumber.setUser(user);
-
+            System.out.println(user);
             numberServices.save(bayNumber);
 
         } else {
